@@ -1,4 +1,4 @@
-package hello;
+package edu.pojo;
 
 public class Fail {
     private String error;

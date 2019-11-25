@@ -1,12 +1,11 @@
-package hello;
+package edu.pojo;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class Status {
     private String status;
     private LocalDateTime date;
-    private String idUser;
+    private double idUser;
 
     public Status() {
     }
@@ -27,11 +26,11 @@ public class Status {
         this.date = date;
     }
 
-    public String getIdUser() {
+    public double getIdUser() {
         return idUser;
     }
 
-    public void setIdUser(String idUser) {
+    public void setIdUser(double idUser) {
         this.idUser = idUser;
     }
 }

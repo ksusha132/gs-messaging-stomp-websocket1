@@ -1,11 +1,12 @@
-package hello;
+package edu.controller;
 
+import edu.pojo.*;
+import edu.service.ExelFileProcessor;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -20,10 +21,13 @@ import java.util.Base64;
 import java.util.Iterator;
 
 @Controller
-public class GreetingController {
+public class MainController {
 
-    @Autowired
-    ExelFileProcessor exelFileProcessor;
+    private ExelFileProcessor exelFileProcessor;
+
+    public MainController(ExelFileProcessor exelFileProcessor) {
+        this.exelFileProcessor = exelFileProcessor;
+    }
 
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
@@ -43,23 +47,7 @@ public class GreetingController {
 
     @MessageMapping("/batch")
     @SendTo("/topic/batch")
-    public Status createBatchObjects(String code) throws IOException {
-        byte[] decodedBytes = Base64.getDecoder().decode(code);
-        String fileName = "temp.xlsx";
-        File file = new File(fileName);
-        FileUtils.writeByteArrayToFile(file, decodedBytes);
-        FileInputStream inputStream = new FileInputStream(file);
-        XSSFWorkbook workbook = new XSSFWorkbook(inputStream);
-        XSSFSheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rowIterator = sheet.iterator();
-        while (rowIterator.hasNext()) {
-            Status st = new Status();
-            st.setDate(LocalDateTime.now());
-            st.setIdUser(rowIterator.next().getCell(0).getStringCellValue());
-            st.setStatus(rowIterator.next().getCell(1).getStringCellValue());
-            return st;
-        }
-
-        return null;
+    public Response createBatchObjects(String code) throws IOException, InterruptedException {
+        return exelFileProcessor.process(code);
     }
 }

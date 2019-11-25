@@ -1,4 +1,4 @@
-package hello;
+package edu;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import edu.pojo.Greeting;
+import edu.pojo.HelloMessage;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -85,7 +87,7 @@ public class GreetingIntegrationTests {
                     }
                 });
                 try {
-                    session.send("/app/hello", new HelloMessage("Spring"));
+                    session.send("/app/edu", new HelloMessage("Spring"));
                 } catch (Throwable t) {
                     failure.set(t);
                     latch.countDown();
