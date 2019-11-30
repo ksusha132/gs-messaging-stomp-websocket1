@@ -26,6 +26,9 @@ function connect() {
         stompClient.subscribe('/topic/batch', function (batch) {
             showFiles(JSON.parse(batch.body).status);
         });
+        stompClient.subscribe('/topic/file', function (batch) {
+            showSpecificFiles(JSON.parse(batch.body).status);
+        });
     });
 }
 
@@ -59,6 +62,13 @@ function sendFile() {
     })
 }
 
+function sendSpecFile() {
+    const file = document.querySelector('#fileSpec').files[0];
+    toBase64(file).then(result => {
+        stompClient.send("/app/file", {}, result.split(',')[1]);
+    })
+}
+
 function showGreeting(message) {
     $("#greetings").append("<tr><td>" + message + "</td></tr>");
 }
@@ -70,6 +80,11 @@ function showFailures(message) {
 function showFiles(message) {
     $("#upfiles").append("<tr><td>" + message + "</td></tr>");
 }
+
+function showSpecificFiles(message) {
+    $("#upFilesSpec").append("<tr><td>" + message + "</td></tr>");
+}
+
 
 $(function () {
     $("form").on('submit', function (e) {
@@ -86,6 +101,9 @@ $(function () {
     });
     $("#upload").click(function () {
         sendFile();
+    });
+    $("#upSpecFiles").click(function () {
+        sendSpecFile();
     });
 });
 

@@ -2,31 +2,26 @@ package edu.controller;
 
 import edu.pojo.*;
 import edu.service.ExelFileProcessor;
-import org.apache.commons.io.FileUtils;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import edu.service.FileCreater;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.util.HtmlUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.Iterator;
 
 @Controller
 public class MainController {
 
     private ExelFileProcessor exelFileProcessor;
+    @Qualifier("jsonFileCreater")
+    private FileCreater fileCreater;
 
-    public MainController(ExelFileProcessor exelFileProcessor) {
+    public MainController(ExelFileProcessor exelFileProcessor, FileCreater jsonFileCreater) {
         this.exelFileProcessor = exelFileProcessor;
+        this.fileCreater = jsonFileCreater;
     }
 
     @MessageMapping("/hello")
@@ -49,5 +44,11 @@ public class MainController {
     @SendTo("/topic/batch")
     public Response createBatchObjects(String code) throws IOException, InterruptedException {
         return exelFileProcessor.process(code);
+    }
+
+    @MessageMapping("/file")
+    @SendTo("/topic/file")
+    public Response createFile(String code) throws IOException, InterruptedException {
+        return fileCreater.create(code);
     }
 }

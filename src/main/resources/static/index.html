@@ -39,10 +39,21 @@
         <div class="col-md-12">
             <form class="form-inline">
                 <div class="form-group">
-                    <label for="name">Upload File</label>
+                    <label for="name">Upload batch file</label>
                     <input type="file" id="file" class="form-control" placeholder="Your file here...">
                 </div>
                 <button id="upload" class="btn btn-default" type="submit">Send</button>
+            </form>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form class="form-inline">
+                <div class="form-group">
+                    <label for="name">Upload Specific file</label>
+                    <input type="file" id="fileSpec" class="form-control" placeholder="Your specific file here...">
+                </div>
+                <button id="upSpecFiles" class="btn btn-default" type="submit">Send</button>
             </form>
         </div>
     </div>
@@ -81,6 +92,19 @@
                 </tr>
                 </thead>
                 <tbody id="upfiles">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <table id="filesSpec" class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Uploaded specific files</th>
+                </tr>
+                </thead>
+                <tbody id="upFilesSpec">
                 </tbody>
             </table>
         </div>

@@ -8,7 +8,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,10 +22,7 @@ import java.util.List;
 public class ExelFileProcessorImpl implements ExelFileProcessor {
     @Override
     public Response process(String encodedString) throws IOException, InterruptedException {
-        XSSFWorkbook workbook = new XSSFWorkbook(createFileFromEncodedString(encodedString));
-        XSSFSheet sheet = workbook.getSheetAt(0);
-        Iterator<Row> rowIterator = sheet.iterator();
-
+        Iterator<Row> rowIterator = createRowIt(encodedString);
         List<Status> statuses = new ArrayList<>();
 
         while (rowIterator.hasNext()) {
@@ -46,13 +42,19 @@ public class ExelFileProcessorImpl implements ExelFileProcessor {
         return resp;
     }
 
+    public Iterator<Row> createRowIt(String encodedString) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook(createFileFromEncodedString(encodedString));
+        XSSFSheet sheet = workbook.getSheetAt(0);
+        return sheet.iterator();
+    }
+
     private Status createStatus(Iterator<Cell> cellIterator) {
         Status st = new Status();
         st.setDate(LocalDateTime.now());
         st.setIdUser(cellIterator.next().getNumericCellValue());
         st.setStatus(cellIterator.next().getStringCellValue());
         return st;
-    }
+    } // todo extract to separate service
 
     private FileInputStream createFileFromEncodedString(String encodedString) throws IOException {
         byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
