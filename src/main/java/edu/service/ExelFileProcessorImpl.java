@@ -2,11 +2,14 @@ package edu.service;
 
 import edu.pojo.Response;
 import edu.pojo.Status;
+import edu.response.ResponseStatus;
 import org.apache.commons.io.FileUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -20,6 +23,9 @@ import java.util.List;
 
 @Component
 public class ExelFileProcessorImpl implements ExelFileProcessor {
+
+    Logger logger = LoggerFactory.getLogger(ExelFileProcessorImpl.class);
+
     @Override
     public Response process(String encodedString) throws IOException, InterruptedException {
         Iterator<Row> rowIterator = createRowIt(encodedString);
@@ -33,10 +39,10 @@ public class ExelFileProcessorImpl implements ExelFileProcessor {
         }
 
         Response resp = new Response();
-        resp.setStatus("OK");
+        resp.setStatus(ResponseStatus.OK.getStatus());
 
         if (statuses.size() == 0) {
-            resp.setStatus("BAD");
+            resp.setStatus(ResponseStatus.BAD.getStatus());
         }
 
         return resp;
@@ -45,6 +51,7 @@ public class ExelFileProcessorImpl implements ExelFileProcessor {
     public Iterator<Row> createRowIt(String encodedString) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook(createFileFromEncodedString(encodedString));
         XSSFSheet sheet = workbook.getSheetAt(0);
+        logger.debug("Physical number of rows: " + sheet.getPhysicalNumberOfRows());
         return sheet.iterator();
     }
 
