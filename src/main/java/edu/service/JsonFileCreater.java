@@ -1,7 +1,7 @@
 package edu.service;
 
 import edu.pojo.Response;
-import edu.pojo.ResponseStatus;
+import edu.response.ResponseStatus;
 import org.apache.poi.ss.usermodel.Row;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
@@ -34,10 +35,12 @@ public class JsonFileCreater implements FileCreater {
         JSONArray countries = new JSONArray();
         while (iterator.hasNext()) {
             Row row = iterator.next();
-            JSONObject object = createJsonObject(row);
-            logger.debug("Added object: " + object.toString());
-            countries.add(object);
-        }
+            if (row.getCell(0) != null) {
+                JSONObject object = createJsonObject(row);
+                logger.debug("Added object: " + object.toString());
+                countries.add(object);
+            }
+        } // todo get file name
 
         createFile(countries);
 
@@ -55,7 +58,7 @@ public class JsonFileCreater implements FileCreater {
         JSONObject object = new JSONObject();
         object.put(ORIGIN_COUNTRY_NAME, row.getCell(0).getStringCellValue());
         object.put(ORIGIN_COUNTRY_NAME_ENG, row.getCell(1).getStringCellValue());
-        object.put(CODE, row.getCell(2).getNumericCellValue());
+        object.put(CODE, (int) row.getCell(2).getNumericCellValue());
         return object;
     }
 
@@ -69,6 +72,6 @@ public class JsonFileCreater implements FileCreater {
     }
 
     private boolean isFileCreated(String fileName) {
-        return true;
+        return new File(fileName).isFile();
     }
 }

@@ -1,6 +1,9 @@
 package edu.controller;
 
-import edu.pojo.*;
+import edu.pojo.Fail;
+import edu.pojo.Greeting;
+import edu.pojo.HelloMessage;
+import edu.pojo.Response;
 import edu.service.ExelFileProcessor;
 import edu.service.FileCreater;
 import org.springframework.beans.factory.annotation.Qualifier;

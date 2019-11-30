@@ -1,4 +1,4 @@
-package edu.pojo;
+package edu.response;
 
 public enum ResponseStatus {
     BAD("BAD"),
