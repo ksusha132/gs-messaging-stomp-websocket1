@@ -30,7 +30,6 @@ public class JsonFileCreater implements FileCreater {
             JsonObject object = createJsonObject(row);
             jsonObjectList.add(object);
         }
-        createFile(jsonObjectList);
         return new Response();
     }
 
