@@ -1,9 +1,8 @@
 package edu.controller;
 
-import edu.pojo.Fail;
-import edu.pojo.Greeting;
-import edu.pojo.HelloMessage;
-import edu.pojo.Response;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pojo.*;
 import edu.service.ExelFileProcessor;
 import edu.service.FileCreater;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,7 +50,8 @@ public class MainController {
 
     @MessageMapping("/file")
     @SendTo("/topic/file")
-    public Response createFile(String code) throws IOException, InterruptedException {
-        return fileCreater.create(code);
+    public Response createFile(String jsonStr) throws IOException, InterruptedException {
+        RequestSpecFile request = new ObjectMapper().readValue(jsonStr, RequestSpecFile.class);
+        return fileCreater.create(request);
     }
 }

@@ -1,9 +1,10 @@
 package edu.service;
 
+import edu.pojo.RequestSpecFile;
 import edu.pojo.Response;
 
 import java.io.IOException;
 
 public interface FileCreater {
-    Response create(String encodedString) throws IOException;
+    Response create(RequestSpecFile requestSpecFile) throws IOException;
 }

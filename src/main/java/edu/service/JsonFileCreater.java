@@ -1,5 +1,6 @@
 package edu.service;
 
+import edu.pojo.RequestSpecFile;
 import edu.pojo.Response;
 import edu.response.ResponseStatus;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,11 +18,12 @@ import java.util.Iterator;
 @Service
 public class JsonFileCreater implements FileCreater {
 
-    Logger logger = LoggerFactory.getLogger(JsonFileCreater.class);
+    private Logger logger = LoggerFactory.getLogger(JsonFileCreater.class);
 
     private static final String ORIGIN_COUNTRY_NAME = "originCountryName";
     private static final String ORIGIN_COUNTRY_NAME_ENG = "originCountryNameEng";
     private static final String CODE = "code";
+    private static final String POSTFIX = ".json";
 
     private ExelFileProcessor exelFileProcessor;
 
@@ -30,24 +32,26 @@ public class JsonFileCreater implements FileCreater {
     }
 
     @Override
-    public Response create(String encodedString) throws IOException {
-        Iterator<Row> iterator = exelFileProcessor.createRowIt(encodedString);
-        JSONArray countries = new JSONArray();
+    public Response create(RequestSpecFile requestSpecFile) throws IOException {
+        String fileName = requestSpecFile.getFileName().split("\\.")[0] + POSTFIX;
+        logger.debug("File name is: " + fileName);
+        Iterator<Row> iterator = exelFileProcessor.createRowIt(requestSpecFile.getCode());
+        JSONArray objectsArr = new JSONArray();
         while (iterator.hasNext()) {
             Row row = iterator.next();
             if (row.getCell(0) != null) {
                 JSONObject object = createJsonObject(row);
                 logger.debug("Added object: " + object.toString());
-                countries.add(object);
+                objectsArr.add(object);
             }
-        } // todo get file name
+        }
 
-        createFile(countries);
+        createFile(objectsArr, fileName);
 
         Response response = new Response();
         response.setStatus(ResponseStatus.OK.getStatus());
 
-        if (!isFileCreated("countries.json")) {
+        if (!isFileCreated(fileName)) {
             response.setStatus(ResponseStatus.BAD.getStatus());
         }
 
@@ -62,9 +66,9 @@ public class JsonFileCreater implements FileCreater {
         return object;
     }
 
-    private void createFile(JSONArray countries) {
-        try (FileWriter file = new FileWriter("countries.json")) {
-            file.write(countries.toJSONString());
+    private void createFile(JSONArray objectsArr, String fileName) {
+        try (FileWriter file = new FileWriter(fileName)) {
+            file.write(objectsArr.toJSONString());
             file.flush();
         } catch (IOException e) {
             e.printStackTrace();
