@@ -3,6 +3,7 @@ package edu.pojo;
 public class RequestSpecFile {
     private String code;
     private String fileName;
+    private String type;
 
     public RequestSpecFile() {
     }
@@ -21,5 +22,13 @@ public class RequestSpecFile {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

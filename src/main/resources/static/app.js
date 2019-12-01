@@ -65,10 +65,12 @@ function sendFile() {
 function sendSpecFile() {
     const file = document.querySelector('#fileSpec').files[0];
     const name = file.name;
+    const type = 'csv';
     toBase64(file).then(result => {
         stompClient.send("/app/file", {}, JSON.stringify({
             fileName: name,
-            code: result.split(',')[1]
+            code: result.split(',')[1],
+            type
         }));
     })
 }
