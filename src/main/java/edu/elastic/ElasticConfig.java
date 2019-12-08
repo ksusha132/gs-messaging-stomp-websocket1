@@ -1,7 +1,6 @@
 package edu.elastic;
 
 import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.TransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
@@ -30,11 +29,10 @@ public class ElasticConfig {
 
     @Bean
     public Client client() {
-        TransportClient client = null;
+        Client client = null;
         try {
-            System.out.println("host:" + host + "port:" + port);
             client = new PreBuiltTransportClient(Settings.EMPTY)
-                    .addTransportAddress(new TransportAddress(InetAddress.getByName("host"), 9200));
+                    .addTransportAddress(new TransportAddress(InetAddress.getByName(host), port));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
