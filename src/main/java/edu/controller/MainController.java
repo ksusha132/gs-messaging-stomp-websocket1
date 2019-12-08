@@ -1,12 +1,12 @@
 package edu.controller;
 
-import edu.pojo.Fail;
-import edu.pojo.Greeting;
-import edu.pojo.HelloMessage;
-import edu.pojo.Response;
-import edu.service.ExelFileProcessor;
-import edu.service.FileCreater;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pojo.*;
+import edu.service.*;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -16,15 +16,15 @@ import org.springframework.web.util.HtmlUtils;
 import java.io.IOException;
 
 @Controller
-public class MainController {
+public class MainController implements ApplicationContextAware {
 
     private ExelFileProcessor exelFileProcessor;
-    @Qualifier("jsonFileCreater")
-    private FileCreater fileCreater;
+    private ApplicationContext applicationContext;
+    private BeanService beanService;
 
-    public MainController(ExelFileProcessor exelFileProcessor, FileCreater jsonFileCreater) {
+    public MainController(ExelFileProcessor exelFileProcessor, BeanService beanService) {
         this.exelFileProcessor = exelFileProcessor;
-        this.fileCreater = jsonFileCreater;
+        this.beanService = beanService;
     }
 
     @MessageMapping("/hello")
@@ -39,8 +39,8 @@ public class MainController {
     @MessageExceptionHandler
     @SendTo("/topic/failure")
     public Fail fail(Throwable exception) throws Exception {
-        Fail fail = new Fail("fatal error with your fucking service! ");
-        return new Fail("Looser! you got the error : " + HtmlUtils.htmlEscape(exception.getMessage()) + "!");
+        Fail fail = new Fail("Fatal error with your service! ");
+        return new Fail("You got the error : " + HtmlUtils.htmlEscape(exception.getMessage()) + "!");
     }
 
     @MessageMapping("/batch")
@@ -51,7 +51,20 @@ public class MainController {
 
     @MessageMapping("/file")
     @SendTo("/topic/file")
-    public Response createFile(String code) throws IOException, InterruptedException {
-        return fileCreater.create(code);
+    public Response createFile(String jsonStr) throws IOException, InterruptedException {
+        RequestSpecFile request = new ObjectMapper().readValue(jsonStr, RequestSpecFile.class);
+        FileCreater creater = (FileCreater) applicationContext.getBean("jsonFileCreater");
+
+        if (request.getType().equalsIgnoreCase("csv")) {
+            String beanName = beanService.getBeanName(request.getType());
+            creater = (CsvFileCreater) applicationContext.getBean(beanName);
+        }
+
+        return creater.create(request);
+    }
+
+    @Override
+    public void setApplicationContext(org.springframework.context.ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }
